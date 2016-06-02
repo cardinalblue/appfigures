@@ -4,10 +4,10 @@ $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require 'appfigures/version'
 
 Gem::Specification.new do |spec|
-  spec.name          = "appfigures"
-  spec.version       = Appfigures::VERSION
-  spec.authors       = ["JimYTC"]
-  spec.email         = ["solofat@gmail.com"]
+  spec.name          = 'appfigures'
+  spec.version       = AppFigures::VERSION
+  spec.authors       = ['JimYTC']
+  spec.email         = ['solofat@gmail.com']
 
   spec.summary       = %q{TODO: Write a short summary, because Rubygems requires one.}
   spec.description   = %q{TODO: Write a longer description or delete this line.}

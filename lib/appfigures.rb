@@ -1,5 +1,4 @@
-require "appfigures/version"
+require 'appfigures/version'
 
-module Appfigures
-  # Your code goes here...
+module AppFigures
 end
