@@ -8,6 +8,11 @@ module AppFigures
     attr_writer :product_ids
 
     def initialize(username:, password:, app_key:, app_secret:)
+      if username.nil? or password.nil? or app_key.nil? or app_secret.nil?
+        raise ArgumentError.new('Arguments cannot be nil. (%s, %s, %s, %s)' %
+                                [username.inspect, password.inspect, app_key.inspect, app_secret.inspect])
+      end
+
       self.username   = username
       self.password   = password
       self.app_key    = app_key
@@ -16,6 +21,10 @@ module AppFigures
 
     def add_product_id(key:, id:)
       product_ids.merge! key.to_sym => id.to_s
+    end
+
+    def clear_product_ids
+      product_ids.clear
     end
 
     def product_ids
