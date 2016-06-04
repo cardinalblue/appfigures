@@ -21,7 +21,10 @@ Or install it yourself as:
 ## Usage
 
 ```ruby
-client = AppFigures::Client.new(username: 'me', password: 'secret', app_key: 'my_key', app_secret: 'dont_say')
+client = AppFigures::Client.new(username:   'me',
+                                password:   'secret',
+                                app_key:    'my_key',
+                                app_secret: 'dont_say')
 
 # To get current API usage
 client.usage
