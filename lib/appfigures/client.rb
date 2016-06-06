@@ -20,6 +20,10 @@ module AppFigures
     end
 
     def add_product_id(key:, id:)
+      if key.nil? or id.nil?
+        raise ArgumentError.new('Arguments cannot be nil. (%s, %s)' % [key.inspect, id.inspect])
+      end
+
       product_ids.merge! key.to_sym => id.to_s
     end
 
