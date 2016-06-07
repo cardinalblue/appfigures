@@ -41,28 +41,50 @@ module AppFigures
 
     def usage
       begin
-        handle_response(do_get(AppFigures::API::USAGE))
+        _, resp = do_get(AppFigures::API::USAGE)
+        resp
       rescue Exception => e
         puts e.message
         puts e.backtrace
       end
     end
 
+    def ranks(args = {})
+      begin
+      _, resp = do_get(API::RANKS)
+      rescue Exception => e
+        puts e.message
+        puts e.backtrace
+      end
+
+    end
+
     private
 
     def do_get(url)
-      curl = Curl::Easy.new(url)
-      curl.http_auth_types = :basic
-      curl.headers['X-Client-Key'] = app_key
-      curl.username = username
-      curl.password = password
+      raise ERROR('Target url should not be nil') if url.nil?
+      response = {}
+      curl = Curl::Easy.new(url) do |c|
+        c.on_header do |header|
+          if header.start_with?('X-Request-Limit:')
+            response[:limit] = header.split.last.to_i
+          elsif header.start_with?('X-Request-Usage:')
+            response[:usage] = header.split.last.to_i
+          end
+          header.length
+        end
+        c.on_success do |easy|
+          response[:body] = JSON.parse(easy.body) rescue nil
+        end
+        c.http_auth_types = :basic
+        c.headers['X-Client-Key'] = app_key
+        c.username = username
+        c.password = password
+      end
       curl.perform
-      curl
+
+      [curl, response]
     end
 
-    def handle_response(curl)
-      puts curl.headers
-      puts curl.body
-    end
   end
 end
