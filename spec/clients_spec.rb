@@ -78,6 +78,45 @@ describe AppFigures::Client do
       client.add_product_id(key: 'key', id: 'id')
       expect { client.clear_product_ids }.to change { client.product_ids.length }.to(0)
     end
+  end
 
+  context 'when testing #do_get' do
+    let(:config) { YAML.load_file('spec/config.example.yaml') }
+    subject(:client) { AppFigures::Client.new(username:   config['username'],
+                                              password:   config['password'],
+                                              app_key:    config['app_key'],
+                                              app_secret: config['app_secret']) }
+
+    it 'raises error with invalid parameter' do
+      expect { client.send(:do_get, nil) }.to raise_error(ArgumentError)
+      expect { client.send(:do_get, 'invalid uri') }.to raise_error(ArgumentError)
+      expect { client.send(:do_get, 'www.ruby-lang.org') }.to raise_error(ArgumentError)
+    end
+
+    it 'invalid header' do
+
+    end
+
+    it 'valid url, failed request(400)' do
+      stub_request(:any, 'http://www.af.com').to_return(body: '{content: \'a response\'}',
+                                                        status: 400,
+                                                        headers: {'X-Request-Limit' => 1000, 'X-Request-Usage' => 10})
+      _, resp = client.send(:do_get, 'http://www.af.com')
+      expect(resp).not_to be_nil
+      expect(resp).not_to have_key(:body)
+      expect(resp[:limit]).to eq(1000)
+      expect(resp[:usage]).to eq(10)
+    end
+
+    it 'successful request(200)' do
+      stub_request(:any, 'http://www.af.com').to_return(body: '{content: \'a response\'}',
+                                                        status: 200,
+                                                        headers: {'X-Request-Limit' => 1000, 'X-Request-Usage' => 10})
+      _, resp = client.send(:do_get, 'http://www.af.com')
+      expect(resp).not_to be_nil
+      expect(resp).to have_key(:body)
+      expect(resp[:limit]).to eq(1000)
+      expect(resp[:usage]).to eq(10)
+    end
   end
 end
