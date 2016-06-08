@@ -43,29 +43,49 @@ module AppFigures
     def usage
       begin
         _, resp = do_get(AppFigures::API::USAGE)
-        resp
+        resp[:body]
       rescue Exception => e
         puts e.message
         puts e.backtrace
       end
     end
 
-    def ranks(args = {})
+    # http://docs.appfigures.com/products
+    # does not support search
+    def products(id: 0, args: {})
+      url = AppFigures::API::PRODUCTS
+      url += "/#{id}" if id > 0
       begin
-      _, resp = do_get(API::RANKS)
+        _, resp = do_get(url, args)
+        resp[:body]
       rescue Exception => e
         puts e.message
         puts e.backtrace
       end
+    end
 
+    # ids: required, separate multiple ids with ;
+    # granularity: either hourly or daily, default daily
+    # start/end dates: in format yyyy-MM-dd, default one day ago to now
+    # http://docs.appfigures.com/api/reference/v2/ranks
+    def ranks(ids: , granularity: 'daily', start_date: days_ago, end_date: days_ago, args: {})
+      url = "#{AppFigures::API::RANKS}/#{ids}/#{granularity}/
+            #{start_date.strftime(PARAM_DATE_FORMAT)}/#{end_date.strftime(PARAM_DATE_FORMAT)}"
+      begin
+        _, resp = do_get(url, args)
+        resp[:body]
+      rescue Exception => e
+        puts e.message
+        puts e.backtrace
+      end
     end
 
     private
 
-    def do_get(url)
+    def do_get(url, args = {})
       raise ArgumentError.new("Invalid url: #{url}") unless url =~ URI::regexp
       response = {}
-      curl = Curl::Easy.new(url) do |c|
+      curl = Curl::Easy.new(Curl::urlalize(url, args)) do |c|
         c.on_header do |header|
           if header.start_with?('X-Request-Limit:')
             response[:limit] = header.split.last.to_i
@@ -83,8 +103,11 @@ module AppFigures
         c.password = password
       end
       curl.perform
-
       [curl, response]
+    end
+
+    def days_ago(days = 1)
+      Time.now - (days * 86400)
     end
 
   end

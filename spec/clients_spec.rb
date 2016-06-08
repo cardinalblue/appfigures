@@ -130,4 +130,46 @@ describe AppFigures::Client do
       expect(resp[:usage]).to eq(10)
     end
   end
+
+  context 'when calling request helpers' do
+    let(:config) { YAML.load_file('spec/config.example.yaml') }
+    subject(:client) { AppFigures::Client.new(username:   config['username'],
+                                              password:   config['password'],
+                                              app_key:    config['app_key'],
+                                              app_secret: config['app_secret']) }
+    before(:each) do
+      @af = stub_request(:any, /#{AppFigures::API::BASE_URL}\/*/)
+    end
+
+    it 'get usage' do
+      body = {'usage'=>10}
+      @af.to_return(body: body.to_json,
+                    status: 200,
+                    headers: {'X-Request-Limit' => 1000, 'X-Request-Usage' => 10})
+      resp = client.usage
+      expect(resp).not_to be_nil
+      expect(resp).to include(body)
+    end
+
+    it 'get products' do
+      body = {'id'=> 1234567, 'name'=>'myapp'}
+      @af.to_return(body: body.to_json,
+                    status: 200,
+                    headers: {'X-Request-Limit' => 1000, 'X-Request-Usage' => 10})
+      resp = client.products
+      expect(resp).not_to be_nil
+      expect(resp).to include(body)
+    end
+    it 'get rank' do
+      body = {'rank'=> 15}
+      @af.to_return(body: body.to_json,
+                    status: 200,
+                    headers: {'X-Request-Limit' => 1000, 'X-Request-Usage' => 10})
+      expect{client.ranks}.to raise_error(ArgumentError)
+      resp = client.ranks(ids:'123;456')
+      expect(resp).not_to be_nil
+      expect(resp).to include(body)
+    end
+  end
+
 end
