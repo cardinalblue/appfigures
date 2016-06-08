@@ -139,6 +139,7 @@ describe AppFigures::Client do
                                               app_secret: config['app_secret']) }
     before(:each) do
       @af = stub_request(:any, /#{AppFigures::API::BASE_URL}\/*/)
+      @date = '2016-01-01'
     end
 
     it 'get usage' do
@@ -160,6 +161,37 @@ describe AppFigures::Client do
       expect(resp).not_to be_nil
       expect(resp).to include(body)
     end
+
+    it 'get sales' do
+      body = {'id'=> 1234567, 'name'=>'myapp'}
+      @af.to_return(body: body.to_json,
+                    status: 200,
+                    headers: {'X-Request-Limit' => 1000, 'X-Request-Usage' => 10})
+      resp = client.sales
+      expect(resp).not_to be_nil
+      expect(resp).to include(body)
+    end
+
+    it 'get revenue' do
+      body = {'id'=> 1234567, 'name'=>'myapp'}
+      @af.to_return(body: body.to_json,
+                    status: 200,
+                    headers: {'X-Request-Limit' => 1000, 'X-Request-Usage' => 10})
+      resp = client.revenue
+      expect(resp).not_to be_nil
+      expect(resp).to include(body)
+    end
+
+    it 'get ads' do
+      body = {'id'=> 1234567, 'name'=>'myapp'}
+      @af.to_return(body: body.to_json,
+                    status: 200,
+                    headers: {'X-Request-Limit' => 1000, 'X-Request-Usage' => 10})
+      resp = client.ads
+      expect(resp).not_to be_nil
+      expect(resp).to include(body)
+    end
+
     it 'get rank' do
       body = {'rank'=> 15}
       @af.to_return(body: body.to_json,
@@ -170,6 +202,77 @@ describe AppFigures::Client do
       expect(resp).not_to be_nil
       expect(resp).to include(body)
     end
+
+    it 'get featured invalid mode' do
+      expect{ client.featured(mode: 'invalid mode') }.to raise_error(ArgumentError)
+    end
+
+    it 'get featured summary' do
+      body = {'id'=> 1234567, 'paths'=> %w(apple free handheld)}
+      @af.to_return(body: body.to_json,
+                    status: 200,
+                    headers: {'X-Request-Limit' => 1000, 'X-Request-Usage' => 10})
+      [
+        [nil,   nil],
+        [nil,   @date],
+        [@date, nil],
+      ].each do |start, end_date|
+        expect{ client.featured(mode: 'summary', start_date: start, end_date: end_date) }.to raise_error(ArgumentError)
+      end
+      resp =  client.featured(start_date: @date, end_date: @date)
+      expect(resp).not_to be_nil
+      expect(resp).to include(body)
+    end
+
+    it 'get featured full' do
+      body = {'id'=> 1234567, 'paths'=> %w(apple free handheld)}
+      @af.to_return(body: body.to_json,
+                    status: 200,
+                    headers: {'X-Request-Limit' => 1000, 'X-Request-Usage' => 10})
+      [
+        [nil,   nil ,  0],
+        [nil,   nil ,  123],
+        [nil,   @date, 0],
+        [nil,   @date, 123],
+        [@date, nil,   0],
+        [@date, nil,   123],
+        [@date, @date, 0],
+      ].each do |start, end_date, id|
+        expect{ client.featured(mode: 'full', start_date: start, end_date: end_date, product_id: id) }.to raise_error(ArgumentError)
+      end
+      resp =  client.featured(mode: 'full', start_date: @date, end_date: @date, product_id: 123)
+      expect(resp).not_to be_nil
+      expect(resp).to include(body)
+    end
+
+    it 'get featured counts' do
+      body = {'id'=> 1234567, 'paths'=> %w(apple free handheld)}
+      @af.to_return(body: body.to_json,
+                    status: 200,
+                    headers: {'X-Request-Limit' => 1000, 'X-Request-Usage' => 10})
+      expect{ client.featured(mode: 'counts') }.to raise_error(ArgumentError)
+      resp =  client.featured(mode: 'counts', args: {end: @date})
+      expect(resp).not_to be_nil
+      expect(resp).to include(body)
+    end
+
+    it 'get featured history' do
+      body = {'id'=> 1234567, 'paths'=> %w(apple free handheld)}
+      @af.to_return(body: body.to_json,
+                    status: 200,
+                    headers: {'X-Request-Limit' => 1000, 'X-Request-Usage' => 10})
+      [
+        [0,   0],
+        [0,   123],
+        [123, 0],
+      ].each do |id, fc_id|
+        expect{ client.featured(mode: 'history', product_id: id, featured_category_id: fc_id) }.to raise_error(ArgumentError)
+      end
+      resp =  client.featured(mode: 'history', product_id: 123, featured_category_id: 456)
+      expect(resp).not_to be_nil
+      expect(resp).to include(body)
+    end
+
   end
 
 end
