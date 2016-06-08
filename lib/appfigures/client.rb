@@ -1,5 +1,6 @@
 require 'curb'
 require 'json'
+require 'uri'
 
 module AppFigures
   class Client
@@ -62,7 +63,7 @@ module AppFigures
     private
 
     def do_get(url)
-      raise ERROR('Target url should not be nil') if url.nil?
+      raise ArgumentError.new("Invalid url: #{url}") unless url =~ URI::regexp
       response = {}
       curl = Curl::Easy.new(url) do |c|
         c.on_header do |header|
