@@ -50,11 +50,19 @@ module AppFigures
       end
     end
 
-    # http://docs.appfigures.com/products
-    # does not support search
+    # Get product info from AppFigures
+    # See http://docs.appfigures.com/products for details
+    # Note:
+    # - AppFigures#products does not support search
+    # - optional to add product id as parameter
+
     def products(id = 0, args = {})
       url = AppFigures::API::PRODUCTS
-      url += "/#{id}" if id > 0
+      if @product_ids.has_value?(id.to_s)
+        url += "/#{id}"
+      else
+        raise ArgumentError.new('Invalid product ID') if id > 0
+      end
       begin
         _, resp = do_get(url, args)
         resp[:body]
@@ -64,7 +72,9 @@ module AppFigures
       end
     end
 
-    # http://docs.appfigures.com/api/reference/v2/sales
+    # Get sales info from Appfigures
+    # See http://docs.appfigures.com/api/reference/v2/sales for details
+
     def sales(args = {})
       begin
         _, resp = do_get(AppFigures::API::SALES, args)
@@ -75,7 +85,8 @@ module AppFigures
       end
     end
 
-    # http://docs.appfigures.com/api/reference/v2/revenue
+    # Get revenue info from AppFigures
+    # See http://docs.appfigures.com/api/reference/v2/revenue for details
     def revenue(args = {})
       begin
         _, resp = do_get(AppFigures::API::REVENUE, args)
@@ -86,7 +97,9 @@ module AppFigures
       end
     end
 
-    # http://docs.appfigures.com/api/reference/v2/ads
+    # Get ads info from AppFigures
+    # See http://docs.appfigures.com/api/reference/v2/ads for details
+
     def ads(args = {})
       begin
         _, resp = do_get(AppFigures::API::ADS, args)
@@ -97,11 +110,14 @@ module AppFigures
       end
     end
 
-    # ids: required, separate multiple ids with ;
-    # granularity: either hourly or daily, default daily
-    # start/end dates: in format yyyy-MM-dd, default one day ago to now
-    # http://docs.appfigures.com/api/reference/v2/ranks
-    def ranks(ids: , granularity: 'daily', start_date: days_ago, end_date: days_ago, args: {})
+    # Get ranking info from AppFigures
+    # See http://docs.appfigures.com/api/reference/v2/ranks for details
+    # #ranks parameters:
+    # - ids: required, separate multiple product ids with ;
+    # - granularity: either hourly or daily, default daily
+    # - start/end dates: in format yyyy-MM-dd, default one day ago to now
+
+    def ranks(ids, granularity= 'daily', start_date= days_ago, end_date= days_ago, args= {})
       url = "#{AppFigures::API::RANKS}/#{ids}/#{granularity}/
             #{start_date.strftime(PARAM_DATE_FORMAT)}/#{end_date.strftime(PARAM_DATE_FORMAT)}"
       begin
@@ -113,8 +129,10 @@ module AppFigures
       end
     end
 
-    # http://docs.appfigures.com/api/reference/v2/featured
-    # mode: summary, full, counts or history; default is summary
+    # Get info on featured products from AppFigures
+    # See http://docs.appfigures.com/api/reference/v2/featured for details
+    # #featured parameters:
+    # - mode: summary, full, counts or history; default is summary
     # - summary: start_date, end_date                 (required)
     # - full:    start_date, end_date, product_id     (required)
     # - counts:  end_date in args                     (required)
@@ -128,18 +146,111 @@ module AppFigures
         url += "/#{start_date}/#{end_date}"
       when 'full'
         raise ArgumentError.new('Missing date') if start_date.nil? || end_date.nil?
-        raise ArgumentError.new('Missing product_id') if product_id == 0
+        raise ArgumentError.new('Missing product_id') if !@product_ids.has_value?(product_id.to_s)
         url += "/#{product_id}/#{start_date}/#{end_date}"
       when 'counts'
         raise ArgumentError.new('Missing end date') unless args.has_key?(:end)
       when 'history'
-        raise ArgumentError.new('Missing id') if product_id == 0 || featured_category_id == 0
+        raise ArgumentError.new('Missing id') if featured_category_id == 0 || !@product_ids.has_value?(product_id.to_s)
         url += "/#{product_id}/#{featured_category_id}"
       else
-        raise ArgumentError.new('Invalid mode')
+        raise ArgumentError.new("Invalid mode: #{mode}")
       end
       begin
         _, resp = do_get(url, args)
+        resp[:body]
+      rescue Exception => e
+        puts e.message
+        puts e.backtrace
+      end
+    end
+
+    # Get reviews info from AppFigures
+    # See http://docs.appfigures.com/api/reference/v2/reviews for details
+    # #reviews parameters:
+    # - mode: no input or 'count'
+
+    def reviews(mode = nil, args = {})
+      case mode
+      when nil, '', '/'
+        url = AppFigures::API::REVIEWS
+      when 'count'
+        url = AppFigures::API::REVIEWS + '/count'
+      else
+        raise ArgumentError.new("Invalid mode: #{mode}")
+      end
+      begin
+        _, resp = do_get(url, args)
+        resp[:body]
+      rescue Exception => e
+        puts e.message
+        puts e.backtrace
+      end
+    end
+
+    # Get ratings info from AppFigures
+    # See http://docs.appfigures.com/api/reference/v2/ratings for details
+
+    def ratings(args = {})
+      begin
+        _, resp = do_get(AppFigures::API::RATINGS, args)
+        resp[:body]
+      rescue Exception => e
+        puts e.message
+        puts e.backtrace
+      end
+    end
+
+    # Get events from AppFigures
+    # See http://docs.appfigures.com/api/reference/v2/events for details
+    # Note: #get_events does not support POST, PUT, and DELETE
+
+    def get_events(args = {})
+      begin
+        _, resp = do_get(AppFigures::API::EVENTS, args)
+        resp[:body]
+      rescue Exception => e
+        puts e.message
+        puts e.backtrace
+      end
+    end
+
+    # Get archived (raw) report data from AppFigures
+    # See http://docs.appfigures.com/api/reference/v2/archive for details
+    # #archive parameters:
+    # - mode: no input, 'latest', or 'raw'
+    # - id: product id, only required for raw mode
+
+    def archive(mode = nil, id = 0, args = {})
+      url = AppFigures::API::ARCHIVE
+      case mode
+      when nil, '', '/'
+      when 'latest'
+        url += '/latest/'
+      when 'raw'
+        raise ArgumentError.new("Invalid id: #{id}") if !@product_ids.has_value?(id.to_s)
+        url += "/raw/#{id}/"
+      else
+        raise ArgumentError.new("Invalid mode: #{mode}")
+      end
+      begin
+        _, resp = do_get(url, args)
+        resp[:body]
+      rescue Exception => e
+        puts e.message
+        puts e.backtrace
+      end
+    end
+
+    # Get user info from AppFigures
+    # See http://docs.appfigures.com/api/reference/v2/users for details
+    # #users parameters:
+    # - email required
+
+    def users(email = nil, args = {})
+      raise ArgumentError.new("Invalid email: #{email}") if email.nil?
+      begin
+        _, resp = do_get(AppFigures::API::USERS + "/#{email}", args)
         resp[:body]
       rescue Exception => e
         puts e.message
