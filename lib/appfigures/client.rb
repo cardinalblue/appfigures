@@ -52,7 +52,7 @@ module AppFigures
 
     # http://docs.appfigures.com/products
     # does not support search
-    def products(id: 0, args: {})
+    def products(id = 0, args = {})
       url = AppFigures::API::PRODUCTS
       url += "/#{id}" if id > 0
       begin
@@ -65,7 +65,7 @@ module AppFigures
     end
 
     # http://docs.appfigures.com/api/reference/v2/sales
-    def sales(args: {})
+    def sales(args = {})
       begin
         _, resp = do_get(AppFigures::API::SALES, args)
         resp[:body]
@@ -76,7 +76,7 @@ module AppFigures
     end
 
     # http://docs.appfigures.com/api/reference/v2/revenue
-    def revenue(args: {})
+    def revenue(args = {})
       begin
         _, resp = do_get(AppFigures::API::REVENUE, args)
         resp[:body]
@@ -87,7 +87,7 @@ module AppFigures
     end
 
     # http://docs.appfigures.com/api/reference/v2/ads
-    def ads(args: {})
+    def ads(args = {})
       begin
         _, resp = do_get(AppFigures::API::ADS, args)
         resp[:body]
