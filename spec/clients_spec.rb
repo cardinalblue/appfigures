@@ -104,6 +104,7 @@ describe AppFigures::Client do
       _, resp = client.send(:do_get, 'http://www.af.com')
       expect(resp).not_to be_nil
       expect(resp[:body]).not_to be_nil
+      expect(resp[:code]).to be(200)
       expect(resp).not_to have_key(:limit)
       expect(resp).not_to have_key(:usage)
     end
@@ -115,6 +116,7 @@ describe AppFigures::Client do
       _, resp = client.send(:do_get, 'http://www.af.com')
       expect(resp).not_to be_nil
       expect(resp).not_to have_key(:body)
+      expect(resp[:code]).to be(400)
       expect(resp[:limit]).to eq(1000)
       expect(resp[:usage]).to eq(10)
     end
@@ -126,6 +128,7 @@ describe AppFigures::Client do
       _, resp = client.send(:do_get, 'http://www.af.com')
       expect(resp).not_to be_nil
       expect(resp[:body]).to be_nil
+      expect(resp[:code]).to be(200)
       expect(resp[:limit]).to eq(1000)
       expect(resp[:usage]).to eq(10)
     end
@@ -137,6 +140,7 @@ describe AppFigures::Client do
       _, resp = client.send(:do_get, 'http://www.af.com')
       expect(resp).not_to be_nil
       expect(resp[:body]).not_to be_nil
+      expect(resp[:code]).to be(200)
       expect(resp[:limit]).to eq(1000)
       expect(resp[:usage]).to eq(10)
     end
@@ -161,7 +165,7 @@ describe AppFigures::Client do
                     headers: { 'X-Request-Limit' => 1000, 'X-Request-Usage' => 10 })
       resp = client.usage
       expect(resp).not_to be_nil
-      expect(resp).to include(body)
+      expect(resp).to include(:body => body, :code => 200, :limit => 1000, :usage => 10)
     end
 
     it 'returns valid body with #products' do
@@ -171,7 +175,7 @@ describe AppFigures::Client do
                     headers: { 'X-Request-Limit' => 1000, 'X-Request-Usage' => 10 })
       resp = client.products
       expect(resp).not_to be_nil
-      expect(resp).to include(body)
+      expect(resp).to include(:body => body, :code => 200, :limit => 1000, :usage => 10)
     end
 
     it 'valid id with #products' do
@@ -181,7 +185,7 @@ describe AppFigures::Client do
                     headers: { 'X-Request-Limit' => 1000, 'X-Request-Usage' => 10 })
       resp = client.products(id = 123)
       expect(resp).not_to be_nil
-      expect(resp).to include(body)
+      expect(resp).to include(:body => body, :code => 200, :limit => 1000, :usage => 10)
     end
 
     it 'invalid id with #products' do
@@ -199,7 +203,7 @@ describe AppFigures::Client do
                     headers: { 'X-Request-Limit' => 1000, 'X-Request-Usage' => 10 })
       resp = client.sales
       expect(resp).not_to be_nil
-      expect(resp).to include(body)
+      expect(resp).to include(:body => body, :code => 200, :limit => 1000, :usage => 10)
     end
 
     it 'return valid body with #revenue' do
@@ -209,7 +213,7 @@ describe AppFigures::Client do
                     headers: { 'X-Request-Limit' => 1000, 'X-Request-Usage' => 10 })
       resp = client.revenue
       expect(resp).not_to be_nil
-      expect(resp).to include(body)
+      expect(resp).to include(:body => body, :code => 200, :limit => 1000, :usage => 10)
     end
 
     it 'return valid body with  #ads' do
@@ -219,7 +223,7 @@ describe AppFigures::Client do
                     headers: { 'X-Request-Limit' => 1000, 'X-Request-Usage' => 10 })
       resp = client.ads
       expect(resp).not_to be_nil
-      expect(resp).to include(body)
+      expect(resp).to include(:body => body, :code => 200, :limit => 1000, :usage => 10)
     end
 
     it 'return valid body with #rank' do
@@ -229,7 +233,7 @@ describe AppFigures::Client do
                     headers: { 'X-Request-Limit' => 1000, 'X-Request-Usage' => 10 })
       resp = client.ranks(ids: 123)
       expect(resp).not_to be_nil
-      expect(resp).to include(body)
+      expect(resp).to include(:body => body, :code => 200, :limit => 1000, :usage => 10)
     end
 
     it 'invalid parameters for #rank (missing id)' do
@@ -251,7 +255,7 @@ describe AppFigures::Client do
                     headers: { 'X-Request-Limit' => 1000, 'X-Request-Usage' => 10 })
       resp =  client.featured(start_date: @date, end_date: @date)
       expect(resp).not_to be_nil
-      expect(resp).to include(body)
+      expect(resp).to include(:body => body, :code => 200, :limit => 1000, :usage => 10)
     end
 
     it 'invalid parameters for #featured summary' do
@@ -277,7 +281,7 @@ describe AppFigures::Client do
                     headers: { 'X-Request-Limit' => 1000, 'X-Request-Usage' => 10 })
       resp =  client.featured(mode: :full, start_date: @date, end_date: @date, product_id: 123)
       expect(resp).not_to be_nil
-      expect(resp).to include(body)
+      expect(resp).to include(:body => body, :code => 200, :limit => 1000, :usage => 10)
     end
 
     it 'invalid parameters for #featured full' do
@@ -308,7 +312,7 @@ describe AppFigures::Client do
                     headers: { 'X-Request-Limit' => 1000, 'X-Request-Usage' => 10} )
       resp =  client.featured(mode: :counts, args: {end: @date})
       expect(resp).not_to be_nil
-      expect(resp).to include(body)
+      expect(resp).to include(:body => body, :code => 200, :limit => 1000, :usage => 10)
     end
 
     it 'invalid parameter for #featured counts' do
@@ -326,7 +330,7 @@ describe AppFigures::Client do
                     headers: { 'X-Request-Limit' => 1000, 'X-Request-Usage' => 10 })
       resp =  client.featured(mode: :history, product_id: 123, featured_category_id: 456)
       expect(resp).not_to be_nil
-      expect(resp).to include(body)
+      expect(resp).to include(:body => body, :code => 200, :limit => 1000, :usage => 10)
     end
 
     it 'invalid parameters for #featured history' do
@@ -353,7 +357,7 @@ describe AppFigures::Client do
                     headers: { 'X-Request-Limit' => 1000, 'X-Request-Usage' => 10 })
       resp =  client.reviews
       expect(resp).not_to be_nil
-      expect(resp).to include(body)
+      expect(resp).to include(:body => body, :code => 200, :limit => 1000, :usage => 10)
     end
 
     it 'return valid body with #reviews count' do
@@ -363,7 +367,7 @@ describe AppFigures::Client do
                     headers: { 'X-Request-Limit' => 1000, 'X-Request-Usage' => 10 })
       resp =  client.reviews(mode = :count)
       expect(resp).not_to be_nil
-      expect(resp).to include(body)
+      expect(resp).to include(:body => body, :code => 200, :limit => 1000, :usage => 10)
     end
 
     it 'invalid mode for #reviews' do
@@ -381,7 +385,7 @@ describe AppFigures::Client do
                     headers: { 'X-Request-Limit' => 1000, 'X-Request-Usage' => 10 })
       resp =  client.ratings
       expect(resp).not_to be_nil
-      expect(resp).to include(body)
+      expect(resp).to include(:body => body, :code => 200, :limit => 1000, :usage => 10)
     end
 
     it 'return valid body with #get_events' do
@@ -391,7 +395,7 @@ describe AppFigures::Client do
                     headers: { 'X-Request-Limit' => 1000, 'X-Request-Usage' => 10 })
       resp =  client.get_events
       expect(resp).not_to be_nil
-      expect(resp).to include(body)
+      expect(resp).to include(:body => body, :code => 200, :limit => 1000, :usage => 10)
     end
 
     it 'return valid body with #archive' do
@@ -401,7 +405,7 @@ describe AppFigures::Client do
                     headers: { 'X-Request-Limit' => 1000, 'X-Request-Usage' => 10 })
       resp =  client.archive
       expect(resp).not_to be_nil
-      expect(resp).to include(body)
+      expect(resp).to include(:body => body, :code => 200, :limit => 1000, :usage => 10)
     end
 
     it 'return valid body with #archive latest' do
@@ -411,7 +415,7 @@ describe AppFigures::Client do
                     headers: { 'X-Request-Limit' => 1000, 'X-Request-Usage' => 10 })
       resp =  client.archive(mode = :latest)
       expect(resp).not_to be_nil
-      expect(resp).to include(body)
+      expect(resp).to include(:body => body, :code => 200, :limit => 1000, :usage => 10)
     end
 
     it 'return valid body with #archive raw' do
@@ -421,7 +425,7 @@ describe AppFigures::Client do
                     headers: { 'X-Request-Limit' => 1000, 'X-Request-Usage' => 10 })
       resp =  client.archive(mode = :raw, id = 123)
       expect(resp).not_to be_nil
-      expect(resp).to include(body)
+      expect(resp).to include(:body => body, :code => 200, :limit => 1000, :usage => 10)
     end
 
     it 'invalid parameter for #archive raw (missing id)' do
@@ -440,7 +444,7 @@ describe AppFigures::Client do
                     headers: { 'X-Request-Limit' => 1000, 'X-Request-Usage' => 10 })
       resp =  client.users(email = 'my_email')
       expect(resp).not_to be_nil
-      expect(resp).to include(body)
+      expect(resp).to include(:body => body, :code => 200, :limit => 1000, :usage => 10)
     end
 
     it 'invalid parameter for #users (invalid email)' do

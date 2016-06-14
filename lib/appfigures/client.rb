@@ -42,7 +42,7 @@ module AppFigures
     def usage
       begin
         _, resp = do_get(AppFigures::API::USAGE)
-        resp[:body]
+        resp
       rescue Exception => e
         puts e.message
         puts e.backtrace
@@ -64,7 +64,7 @@ module AppFigures
       end
       begin
         _, resp = do_get(url, args)
-        resp[:body]
+        resp
       rescue Exception => e
         puts e.message
         puts e.backtrace
@@ -77,7 +77,7 @@ module AppFigures
     def sales(args = {})
       begin
         _, resp = do_get(AppFigures::API::SALES, args)
-        resp[:body]
+        resp
       rescue Exception => e
         puts e.message
         puts e.backtrace
@@ -89,7 +89,7 @@ module AppFigures
     def revenue(args = {})
       begin
         _, resp = do_get(AppFigures::API::REVENUE, args)
-        resp[:body]
+        resp
       rescue Exception => e
         puts e.message
         puts e.backtrace
@@ -102,7 +102,7 @@ module AppFigures
     def ads(args = {})
       begin
         _, resp = do_get(AppFigures::API::ADS, args)
-        resp[:body]
+        resp
       rescue Exception => e
         puts e.message
         puts e.backtrace
@@ -121,7 +121,7 @@ module AppFigures
             #{start_date.strftime(PARAM_DATE_FORMAT)}/#{end_date.strftime(PARAM_DATE_FORMAT)}"
       begin
         _, resp = do_get(url, args)
-        resp[:body]
+        resp
       rescue Exception => e
         puts e.message
         puts e.backtrace
@@ -157,7 +157,7 @@ module AppFigures
       end
       begin
         _, resp = do_get(url, args)
-        resp[:body]
+        resp
       rescue Exception => e
         puts e.message
         puts e.backtrace
@@ -180,7 +180,7 @@ module AppFigures
       end
       begin
         _, resp = do_get(url, args)
-        resp[:body]
+        resp
       rescue Exception => e
         puts e.message
         puts e.backtrace
@@ -193,7 +193,7 @@ module AppFigures
     def ratings(args = {})
       begin
         _, resp = do_get(AppFigures::API::RATINGS, args)
-        resp[:body]
+        resp
       rescue Exception => e
         puts e.message
         puts e.backtrace
@@ -207,7 +207,7 @@ module AppFigures
     def get_events(args = {})
       begin
         _, resp = do_get(AppFigures::API::EVENTS, args)
-        resp[:body]
+        resp
       rescue Exception => e
         puts e.message
         puts e.backtrace
@@ -234,7 +234,7 @@ module AppFigures
       end
       begin
         _, resp = do_get(url, args)
-        resp[:body]
+        resp
       rescue Exception => e
         puts e.message
         puts e.backtrace
@@ -250,7 +250,7 @@ module AppFigures
       raise ArgumentError.new("Invalid email: #{email}") if email.nil?
       begin
         _, resp = do_get(AppFigures::API::USERS + "/#{email}", args)
-        resp[:body]
+        resp
       rescue Exception => e
         puts e.message
         puts e.backtrace
@@ -280,6 +280,7 @@ module AppFigures
         c.password = password
       end
       curl.perform
+      response[:code] = curl.response_code.to_i
       [curl, response]
     end
 
