@@ -24,7 +24,6 @@ module AppFigures
       if key.nil? or id.nil?
         raise ArgumentError.new('Arguments cannot be nil. (%s, %s)' % [key.inspect, id.inspect])
       end
-
       product_ids.merge! key.to_sym => id.to_s
     end
 
@@ -132,29 +131,29 @@ module AppFigures
     # Get info on featured products from AppFigures
     # See http://docs.appfigures.com/api/reference/v2/featured for details
     # #featured parameters:
-    # - mode: summary, full, counts or history; default is summary
+    # - mode: summary, full, counts or history, as symbols; default is summary
     # - summary: start_date, end_date                 (required)
     # - full:    start_date, end_date, product_id     (required)
     # - counts:  end_date in args                     (required)
     # - history: product_id, featured_category_id     (required)
 
-    def featured(mode: 'summary', start_date: nil , end_date: nil, product_id: 0, featured_category_id: 0, args: {})
+    def featured(mode: :summary, start_date: nil , end_date: nil, product_id: 0, featured_category_id: 0, args: {})
       url = AppFigures::API::FEATURED + "/#{mode}"
       case mode
-      when 'summary'
+      when :summary
         raise ArgumentError.new('Missing date') if start_date.nil? || end_date.nil?
         url += "/#{start_date}/#{end_date}"
-      when 'full'
+      when :full
         raise ArgumentError.new('Missing date') if start_date.nil? || end_date.nil?
         raise ArgumentError.new('Missing product_id') if !@product_ids.has_value?(product_id.to_s)
         url += "/#{product_id}/#{start_date}/#{end_date}"
-      when 'counts'
+      when :counts
         raise ArgumentError.new('Missing end date') unless args.has_key?(:end)
-      when 'history'
+      when :history
         raise ArgumentError.new('Missing id') if featured_category_id == 0 || !@product_ids.has_value?(product_id.to_s)
         url += "/#{product_id}/#{featured_category_id}"
       else
-        raise ArgumentError.new("Invalid mode: #{mode}")
+        raise ArgumentError.new("Invalid mode: #{mode.to_s}")
       end
       begin
         _, resp = do_get(url, args)
@@ -168,16 +167,16 @@ module AppFigures
     # Get reviews info from AppFigures
     # See http://docs.appfigures.com/api/reference/v2/reviews for details
     # #reviews parameters:
-    # - mode: no input or 'count'
+    # - mode: no input or :count (as symbol)
 
     def reviews(mode = nil, args = {})
       case mode
       when nil, '', '/'
         url = AppFigures::API::REVIEWS
-      when 'count'
+      when :count
         url = AppFigures::API::REVIEWS + '/count'
       else
-        raise ArgumentError.new("Invalid mode: #{mode}")
+        raise ArgumentError.new("Invalid mode: #{mode.to_s}")
       end
       begin
         _, resp = do_get(url, args)
@@ -218,20 +217,20 @@ module AppFigures
     # Get archived (raw) report data from AppFigures
     # See http://docs.appfigures.com/api/reference/v2/archive for details
     # #archive parameters:
-    # - mode: no input, 'latest', or 'raw'
+    # - mode: no input, :latest, or :raw (as symbols)
     # - id: product id, only required for raw mode
 
     def archive(mode = nil, id = 0, args = {})
       url = AppFigures::API::ARCHIVE
       case mode
       when nil, '', '/'
-      when 'latest'
+      when :latest
         url += '/latest/'
-      when 'raw'
+      when :raw
         raise ArgumentError.new("Invalid id: #{id}") if !@product_ids.has_value?(id.to_s)
         url += "/raw/#{id}/"
       else
-        raise ArgumentError.new("Invalid mode: #{mode}")
+        raise ArgumentError.new("Invalid mode: #{mode.to_s}")
       end
       begin
         _, resp = do_get(url, args)

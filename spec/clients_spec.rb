@@ -241,7 +241,7 @@ describe AppFigures::Client do
     end
 
     it 'invalid mode for #featured' do
-      expect{ client.featured(mode: 'invalid mode') }.to raise_error(ArgumentError)
+      expect{ client.featured(mode: :invalid_mode) }.to raise_error(ArgumentError)
     end
 
     it 'return valid body with #featured summary' do
@@ -265,7 +265,7 @@ describe AppFigures::Client do
         [@date, nil],
       ].each do |start, end_date|
         expect{
-          client.featured(mode: 'summary', start_date: start, end_date: end_date)
+          client.featured(mode: :summary, start_date: start, end_date: end_date)
         }.to raise_error(ArgumentError)
       end
     end
@@ -275,7 +275,7 @@ describe AppFigures::Client do
       @af.to_return(body: body.to_json,
                     status: 200,
                     headers: { 'X-Request-Limit' => 1000, 'X-Request-Usage' => 10 })
-      resp =  client.featured(mode: 'full', start_date: @date, end_date: @date, product_id: 123)
+      resp =  client.featured(mode: :full, start_date: @date, end_date: @date, product_id: 123)
       expect(resp).not_to be_nil
       expect(resp).to include(body)
     end
@@ -296,7 +296,7 @@ describe AppFigures::Client do
         [@date, @date, 012]
       ].each do |start, end_date, id|
         expect{
-          client.featured(mode: 'full', start_date: start, end_date: end_date, product_id: id)
+          client.featured(mode: :full, start_date: start, end_date: end_date, product_id: id)
         }.to raise_error(ArgumentError)
       end
     end
@@ -306,7 +306,7 @@ describe AppFigures::Client do
       @af.to_return(body: body.to_json,
                     status: 200,
                     headers: { 'X-Request-Limit' => 1000, 'X-Request-Usage' => 10} )
-      resp =  client.featured(mode: 'counts', args: {end: @date})
+      resp =  client.featured(mode: :counts, args: {end: @date})
       expect(resp).not_to be_nil
       expect(resp).to include(body)
     end
@@ -316,7 +316,7 @@ describe AppFigures::Client do
       @af.to_return(body: body.to_json,
                     status: 200,
                     headers: { 'X-Request-Limit' => 1000, 'X-Request-Usage' => 10} )
-      expect{ client.featured(mode: 'counts') }.to raise_error(ArgumentError)
+      expect{ client.featured(mode: :counts) }.to raise_error(ArgumentError)
     end
 
     it 'return valid body with #featured history' do
@@ -324,7 +324,7 @@ describe AppFigures::Client do
       @af.to_return(body: body.to_json,
                     status: 200,
                     headers: { 'X-Request-Limit' => 1000, 'X-Request-Usage' => 10 })
-      resp =  client.featured(mode: 'history', product_id: 123, featured_category_id: 456)
+      resp =  client.featured(mode: :history, product_id: 123, featured_category_id: 456)
       expect(resp).not_to be_nil
       expect(resp).to include(body)
     end
@@ -341,7 +341,7 @@ describe AppFigures::Client do
         [012, 012]
       ].each do |id, fc_id|
         expect{
-          client.featured(mode: 'history', product_id: id, featured_category_id: fc_id)
+          client.featured(mode: :history, product_id: id, featured_category_id: fc_id)
         }.to raise_error(ArgumentError)
       end
     end
@@ -361,7 +361,7 @@ describe AppFigures::Client do
       @af.to_return(body: body.to_json,
                     status: 200,
                     headers: { 'X-Request-Limit' => 1000, 'X-Request-Usage' => 10 })
-      resp =  client.reviews(mode = 'count')
+      resp =  client.reviews(mode = :count)
       expect(resp).not_to be_nil
       expect(resp).to include(body)
     end
@@ -371,7 +371,7 @@ describe AppFigures::Client do
       @af.to_return(body: body.to_json,
                     status: 200,
                     headers: { 'X-Request-Limit' => 1000, 'X-Request-Usage' => 10 })
-      expect{ client.reviews(mode = 'invalid mode') }.to raise_error(ArgumentError)
+      expect{ client.reviews(mode = :invalid_mode) }.to raise_error(ArgumentError)
     end
 
     it 'return valid body with #ratings' do
@@ -409,7 +409,7 @@ describe AppFigures::Client do
       @af.to_return(body: body.to_json,
                     status: 200,
                     headers: { 'X-Request-Limit' => 1000, 'X-Request-Usage' => 10 })
-      resp =  client.archive(mode = 'latest')
+      resp =  client.archive(mode = :latest)
       expect(resp).not_to be_nil
       expect(resp).to include(body)
     end
@@ -419,7 +419,7 @@ describe AppFigures::Client do
       @af.to_return(body: body.to_json,
                     status: 200,
                     headers: { 'X-Request-Limit' => 1000, 'X-Request-Usage' => 10 })
-      resp =  client.archive(mode = 'raw', id = 123)
+      resp =  client.archive(mode = :raw, id = 123)
       expect(resp).not_to be_nil
       expect(resp).to include(body)
     end
@@ -429,8 +429,8 @@ describe AppFigures::Client do
       @af.to_return(body: body.to_json,
                     status: 200,
                     headers: { 'X-Request-Limit' => 1000, 'X-Request-Usage' => 10 })
-      expect{ client.archive(mode = 'raw') }.to raise_error(ArgumentError)
-      expect{ client.archive(mode = 'raw', id = 012) }.to raise_error(ArgumentError)
+      expect{ client.archive(mode = :raw) }.to raise_error(ArgumentError)
+      expect{ client.archive(mode = :raw, id = 012) }.to raise_error(ArgumentError)
     end
 
     it 'return valid body with #users' do
