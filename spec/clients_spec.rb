@@ -365,7 +365,7 @@ describe AppFigures::Client do
       @af.to_return(body: body.to_json,
                     status: 200,
                     headers: { 'X-Request-Limit' => 1000, 'X-Request-Usage' => 10 })
-      resp =  client.reviews(mode = :count)
+      resp =  client.reviews(mode: :count)
       expect(resp).not_to be_nil
       expect(resp).to include(:body => body, :code => 200, :limit => 1000, :usage => 10)
     end
@@ -375,7 +375,7 @@ describe AppFigures::Client do
       @af.to_return(body: body.to_json,
                     status: 200,
                     headers: { 'X-Request-Limit' => 1000, 'X-Request-Usage' => 10 })
-      expect{ client.reviews(mode = :invalid_mode) }.to raise_error(ArgumentError)
+      expect{ client.reviews(mode: :invalid_mode) }.to raise_error(ArgumentError)
     end
 
     it 'return valid body with #ratings' do
@@ -413,7 +413,7 @@ describe AppFigures::Client do
       @af.to_return(body: body.to_json,
                     status: 200,
                     headers: { 'X-Request-Limit' => 1000, 'X-Request-Usage' => 10 })
-      resp =  client.archive(mode = :latest)
+      resp =  client.archive(mode: :latest)
       expect(resp).not_to be_nil
       expect(resp).to include(:body => body, :code => 200, :limit => 1000, :usage => 10)
     end
@@ -423,7 +423,7 @@ describe AppFigures::Client do
       @af.to_return(body: body.to_json,
                     status: 200,
                     headers: { 'X-Request-Limit' => 1000, 'X-Request-Usage' => 10 })
-      resp =  client.archive(mode = :raw, id = 123)
+      resp =  client.archive(mode: :raw, id: 123)
       expect(resp).not_to be_nil
       expect(resp).to include(:body => body, :code => 200, :limit => 1000, :usage => 10)
     end
@@ -433,8 +433,8 @@ describe AppFigures::Client do
       @af.to_return(body: body.to_json,
                     status: 200,
                     headers: { 'X-Request-Limit' => 1000, 'X-Request-Usage' => 10 })
-      expect{ client.archive(mode = :raw) }.to raise_error(ArgumentError)
-      expect{ client.archive(mode = :raw, id = 012) }.to raise_error(ArgumentError)
+      expect{ client.archive(mode: :raw) }.to raise_error(ArgumentError)
+      expect{ client.archive(mode: :raw, id: 012) }.to raise_error(ArgumentError)
     end
 
     it 'return valid body with #users' do

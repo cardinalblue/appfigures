@@ -169,7 +169,7 @@ module AppFigures
     # #reviews parameters:
     # - mode: no input or :count (as symbol)
 
-    def reviews(mode = nil, args = {})
+    def reviews(mode: nil, args: {})
       case mode
       when nil, '', '/'
         url = AppFigures::API::REVIEWS
@@ -220,7 +220,7 @@ module AppFigures
     # - mode: no input, :latest, or :raw (as symbols)
     # - id: product id, only required for raw mode
 
-    def archive(mode = nil, id = 0, args = {})
+    def archive(mode: nil, id: 0, args: {})
       url = AppFigures::API::ARCHIVE
       case mode
       when nil, '', '/'
