@@ -231,7 +231,7 @@ describe AppFigures::Client do
       @af.to_return(body: body.to_json,
                     status: 200,
                     headers: { 'X-Request-Limit' => 1000, 'X-Request-Usage' => 10 })
-      resp = client.ranks(ids: 123)
+      resp = client.ranks(ids: 123, granularity: :hourly)
       expect(resp).not_to be_nil
       expect(resp).to include(:body => body, :code => 200, :limit => 1000, :usage => 10)
     end
