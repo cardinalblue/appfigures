@@ -55,7 +55,7 @@ module AppFigures
     # - AppFigures#products does not support search
     # - optional to add product id as parameter
 
-    def products(id = 0, args = {})
+    def products(id: 0, args: {})
       url = AppFigures::API::PRODUCTS
       if @product_ids.has_value?(id.to_s)
         url += "/#{id}"
@@ -113,12 +113,12 @@ module AppFigures
     # See http://docs.appfigures.com/api/reference/v2/ranks for details
     # #ranks parameters:
     # - ids: required, separate multiple product ids with ;
-    # - granularity: either hourly or daily, default daily
+    # - granularity: either :hourly or :daily as symbols, default daily
     # - start/end dates: in format yyyy-MM-dd, default one day ago to now
 
-    def ranks(ids, granularity= 'daily', start_date= days_ago, end_date= days_ago, args= {})
+    def ranks(ids, granularity: :daily, start_date: days_ago, end_date: days_ago, args: {})
       url = "#{AppFigures::API::RANKS}/#{ids}/#{granularity}/
-            #{start_date.strftime(PARAM_DATE_FORMAT)}/#{end_date.strftime(PARAM_DATE_FORMAT)}"
+            #{start_date}/#{end_date}"
       begin
         _, resp = do_get(url, args)
         resp
@@ -246,8 +246,7 @@ module AppFigures
     # #users parameters:
     # - email required
 
-    def users(email = nil, args = {})
-      raise ArgumentError.new("Invalid email: #{email}") if email.nil?
+    def users(email, args: {})
       begin
         _, resp = do_get(AppFigures::API::USERS + "/#{email}", args)
         resp
@@ -285,7 +284,7 @@ module AppFigures
     end
 
     def days_ago(days = 1)
-      Time.now - (days * 86400)
+      (Time.now - (days * 86400)).strftime(PARAM_DATE_FORMAT)
     end
 
   end
