@@ -116,7 +116,7 @@ module AppFigures
     # - granularity: either :hourly or :daily as symbols, default daily
     # - start/end dates: in format yyyy-MM-dd, default one day ago to now
 
-    def ranks(ids, granularity: :daily, start_date: days_ago, end_date: days_ago, args: {})
+    def ranks(ids:, granularity: :daily, start_date: days_ago, end_date: days_ago, args: {})
       url = "#{AppFigures::API::RANKS}/#{ids}/#{granularity.to_s}/#{start_date}/#{end_date}"
       begin
         _, resp = do_get(url, args)
