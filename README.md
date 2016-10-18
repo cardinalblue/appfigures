@@ -9,16 +9,12 @@ Ruby client for access AppFigures API
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'appfigures'
+gem 'appfigures', git: 'git://github.com/cardinalblue/appfigures.git'
 ```
 
 And then execute:
 
-    $ bundle
-
-Or install it yourself as:
-
-    $ gem install appfigures
+    $ bundle install
 
 ## Usage
 
