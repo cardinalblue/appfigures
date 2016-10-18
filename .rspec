@@ -1,2 +1,4 @@
---format documentation
+--tty
 --color
+--format documentation
+--backtrace
