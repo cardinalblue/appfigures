@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/cardinalblue/appfigures.svg?branch=master)](https://travis-ci.org/cardinalblue/appfigures)
+[![Build Status](https://travis-ci.org/cardinalblue/appfigures.svg?branch=master)](https://travis-ci.org/cardinalblue/appfigures) [![Code Climate](https://codeclimate.com/github/cardinalblue/appfigures/badges/gpa.svg)](https://codeclimate.com/github/cardinalblue/appfigures)
 
 # AppFigures
 
