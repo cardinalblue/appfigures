@@ -1,6 +1,7 @@
 language: ruby
 script: "bundle exec rake"
 sudo: false
+before_install: gem install bundler -v 1.12.4
 rvm:
   - 1.8.7
   - 1.9.2
