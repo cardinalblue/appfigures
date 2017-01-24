@@ -1,4 +1,4 @@
-require 'curb'
+require 'typhoeus'
 require 'json'
 require 'uri'
 
@@ -259,27 +259,23 @@ module AppFigures
 
     def do_get(url, args = {})
       raise ArgumentError.new("Invalid url: #{url}") unless url =~ URI::regexp
-      response = {}
-      curl = Curl::Easy.new(Curl::urlalize(url, args)) do |c|
-        c.on_header do |header|
-          if header.start_with?('X-Request-Limit:')
-            response[:limit] = header.split.last.to_i
-          elsif header.start_with?('X-Request-Usage:')
-            response[:usage] = header.split.last.to_i
-          end
-          header.length
-        end
-        c.on_success do |easy|
-          response[:body] = JSON.parse(easy.body) rescue nil
-        end
-        c.http_auth_types = :basic
-        c.headers['X-Client-Key'] = app_key
-        c.username = username
-        c.password = password
+      response = Typhoeus.get(url, headers: { 'X-Client-Key' => app_key },
+                                   userpwd: "#{username}:#{password}",
+                                   params: args)
+
+      result = {}
+      result[:code]  = response.code
+      if response.headers.has_key?('X-Request-Limit')
+        result[:limit] = response.headers['X-Request-Limit'].to_i
       end
-      curl.perform
-      response[:code] = curl.response_code.to_i
-      [curl, response]
+      if response.headers.has_key?('X-Request-Usage')
+        result[:usage] = response.headers['X-Request-Usage'].to_i
+      end
+      if response.code == 200
+        result[:body] = JSON.parse(response.body) rescue nil
+      end
+
+      [nil, result]
     end
 
     def days_ago(days = 1)
