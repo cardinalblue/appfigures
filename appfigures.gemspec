@@ -6,8 +6,8 @@ require 'appfigures/version'
 Gem::Specification.new do |spec|
   spec.name          = 'appfigures'
   spec.version       = AppFigures::VERSION
-  spec.authors       = ['JimYTC']
-  spec.email         = ['solofat@gmail.com']
+  spec.authors       = ['JimYTC', 'Tiffany Chiang']
+  spec.email         = ['solofat@gmail.com', 'tchiang@andrew.cmu.edu']
 
   spec.summary       = %q{Ruby client for access AppFigures API}
   spec.description   = %q{Wrap up AppFigures API calls to fasten access}
