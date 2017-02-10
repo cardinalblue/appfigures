@@ -6,8 +6,8 @@ require 'appfigures/version'
 Gem::Specification.new do |spec|
   spec.name          = 'appfigures'
   spec.version       = AppFigures::VERSION
-  spec.authors       = ['JimYTC']
-  spec.email         = ['solofat@gmail.com']
+  spec.authors       = ['JimYTC', 'Tiffany Chiang']
+  spec.email         = ['solofat@gmail.com', 'tchiang@andrew.cmu.edu']
 
   spec.summary       = %q{Ruby client for access AppFigures API}
   spec.description   = %q{Wrap up AppFigures API calls to fasten access}
@@ -27,10 +27,10 @@ Gem::Specification.new do |spec|
   spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
   spec.require_paths = ['lib']
 
-  spec.add_development_dependency 'bundler', '~> 1.12'
-  spec.add_development_dependency 'rake', '~> 10.0'
-  spec.add_development_dependency 'rspec', '~> 3.0'
-  spec.add_development_dependency 'webmock', '~> 2.0'
+  spec.add_development_dependency 'bundler', '~> 1.14'
+  spec.add_development_dependency 'rake', '~> 12.0'
+  spec.add_development_dependency 'rspec', '~> 3.5'
+  spec.add_development_dependency 'webmock', '~> 2.3'
 
-  spec.add_runtime_dependency 'curb', '~> 0'
+  spec.add_runtime_dependency 'typhoeus', '~> 1.1'
 end
