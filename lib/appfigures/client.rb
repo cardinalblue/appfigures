@@ -41,8 +41,7 @@ module AppFigures
 
     def usage
       begin
-        _, resp = do_get(AppFigures::API::USAGE)
-        resp
+        do_get(AppFigures::API::USAGE)
       rescue Exception => e
         puts e.message
         puts e.backtrace
@@ -63,8 +62,7 @@ module AppFigures
         raise ArgumentError.new('Invalid product ID') if id > 0
       end
       begin
-        _, resp = do_get(url, args)
-        resp
+        do_get(url, args)
       rescue Exception => e
         puts e.message
         puts e.backtrace
@@ -76,8 +74,7 @@ module AppFigures
 
     def sales(args = {})
       begin
-        _, resp = do_get(AppFigures::API::SALES, args)
-        resp
+        do_get(AppFigures::API::SALES, args)
       rescue Exception => e
         puts e.message
         puts e.backtrace
@@ -88,8 +85,7 @@ module AppFigures
     # See http://docs.appfigures.com/api/reference/v2/revenue for details
     def revenue(args = {})
       begin
-        _, resp = do_get(AppFigures::API::REVENUE, args)
-        resp
+        do_get(AppFigures::API::REVENUE, args)
       rescue Exception => e
         puts e.message
         puts e.backtrace
@@ -101,8 +97,7 @@ module AppFigures
 
     def ads(args = {})
       begin
-        _, resp = do_get(AppFigures::API::ADS, args)
-        resp
+        do_get(AppFigures::API::ADS, args)
       rescue Exception => e
         puts e.message
         puts e.backtrace
@@ -119,8 +114,7 @@ module AppFigures
     def ranks(ids:, granularity: :daily, start_date: days_ago, end_date: days_ago, args: {})
       url = "#{AppFigures::API::RANKS}/#{ids}/#{granularity.to_s}/#{start_date}/#{end_date}"
       begin
-        _, resp = do_get(url, args)
-        resp
+        do_get(url, args)
       rescue Exception => e
         puts e.message
         puts e.backtrace
@@ -155,8 +149,7 @@ module AppFigures
         raise ArgumentError.new("Invalid mode: #{mode.to_s}")
       end
       begin
-        _, resp = do_get(url, args)
-        resp
+        do_get(url, args)
       rescue Exception => e
         puts e.message
         puts e.backtrace
@@ -178,8 +171,7 @@ module AppFigures
         raise ArgumentError.new("Invalid mode: #{mode.to_s}")
       end
       begin
-        _, resp = do_get(url, args)
-        resp
+        do_get(url, args)
       rescue Exception => e
         puts e.message
         puts e.backtrace
@@ -191,8 +183,7 @@ module AppFigures
 
     def ratings(args = {})
       begin
-        _, resp = do_get(AppFigures::API::RATINGS, args)
-        resp
+        do_get(AppFigures::API::RATINGS, args)
       rescue Exception => e
         puts e.message
         puts e.backtrace
@@ -205,8 +196,7 @@ module AppFigures
 
     def get_events(args = {})
       begin
-        _, resp = do_get(AppFigures::API::EVENTS, args)
-        resp
+        do_get(AppFigures::API::EVENTS, args)
       rescue Exception => e
         puts e.message
         puts e.backtrace
@@ -232,8 +222,7 @@ module AppFigures
         raise ArgumentError.new("Invalid mode: #{mode.to_s}")
       end
       begin
-        _, resp = do_get(url, args)
-        resp
+        do_get(url, args)
       rescue Exception => e
         puts e.message
         puts e.backtrace
@@ -247,8 +236,7 @@ module AppFigures
 
     def users(email, args: {})
       begin
-        _, resp = do_get(AppFigures::API::USERS + "/#{email}", args)
-        resp
+        do_get(AppFigures::API::USERS + "/#{email}", args)
       rescue Exception => e
         puts e.message
         puts e.backtrace
@@ -263,19 +251,26 @@ module AppFigures
                                    userpwd: "#{username}:#{password}",
                                    params: args)
 
-      result = {}
-      result[:code]  = response.code
-      if response.headers.has_key?('X-Request-Limit')
-        result[:limit] = response.headers['X-Request-Limit'].to_i
-      end
-      if response.headers.has_key?('X-Request-Usage')
-        result[:usage] = response.headers['X-Request-Usage'].to_i
+      result = {
+        code: response.code,
+        body: [],
+        limit: -1,
+        usage: -1
+      }
+
+      if response.headers
+        if response.headers.has_key?('X-Request-Limit')
+          result[:limit] = response.headers['X-Request-Limit'].to_i
+        end
+        if response.headers.has_key?('X-Request-Usage')
+          result[:usage] = response.headers['X-Request-Usage'].to_i
+        end
       end
       if response.code == 200
-        result[:body] = JSON.parse(response.body) rescue nil
+        result[:body] = JSON.parse(response.body) rescue []
       end
 
-      [nil, result]
+      result
     end
 
     def days_ago(days = 1)

@@ -97,25 +97,37 @@ describe AppFigures::Client do
       end
     end
 
+    it 'default result' do
+      response_code = 401
+      @af.to_return(status: response_code)
+      resp = client.send(:do_get, 'http://www.af.com')
+      expect(resp).not_to be_nil
+      expect(resp[:body]).to eq([])
+      expect(resp[:code]).to be(response_code)
+      expect(resp[:limit]).to eq(-1)
+      expect(resp[:usage]).to eq(-1)
+    end
+
     it 'invalid header' do
-      @af.to_return(body: { content:'response' }.to_json,
+      response_body = { 'content' => 'response' }
+      @af.to_return(body: response_body.to_json,
                     status: 200,
                     headers: { 'Invalid header' => 1000, 'Wrong' => 10 })
-      _, resp = client.send(:do_get, 'http://www.af.com')
+      resp = client.send(:do_get, 'http://www.af.com')
       expect(resp).not_to be_nil
-      expect(resp[:body]).not_to be_nil
+      expect(resp[:body]).to eq(response_body)
       expect(resp[:code]).to be(200)
-      expect(resp).not_to have_key(:limit)
-      expect(resp).not_to have_key(:usage)
+      expect(resp[:limit]).to eq(-1)
+      expect(resp[:usage]).to eq(-1)
     end
 
     it 'valid url, failed request(400)' do
-      @af.to_return(body: { content:'response' }.to_json,
+      @af.to_return(body: { 'content' => 'response' }.to_json,
                     status: 400,
                     headers: { 'X-Request-Limit' => 1000, 'X-Request-Usage' => 10 })
-      _, resp = client.send(:do_get, 'http://www.af.com')
+      resp = client.send(:do_get, 'http://www.af.com')
       expect(resp).not_to be_nil
-      expect(resp).not_to have_key(:body)
+      expect(resp[:body]).to eq([])
       expect(resp[:code]).to be(400)
       expect(resp[:limit]).to eq(1000)
       expect(resp[:usage]).to eq(10)
@@ -125,21 +137,22 @@ describe AppFigures::Client do
       @af.to_return(body: 'response',
                     status: 200,
                     headers: { 'X-Request-Limit' => 1000, 'X-Request-Usage' => 10 })
-      _, resp = client.send(:do_get, 'http://www.af.com')
+      resp = client.send(:do_get, 'http://www.af.com')
       expect(resp).not_to be_nil
-      expect(resp[:body]).to be_nil
+      expect(resp[:body]).to eq([])
       expect(resp[:code]).to be(200)
       expect(resp[:limit]).to eq(1000)
       expect(resp[:usage]).to eq(10)
     end
 
     it 'successful request(200)' do
-      @af.to_return(body: { content:'response' }.to_json,
+      response_body = { 'content' => 'response' }
+      @af.to_return(body: response_body.to_json,
                     status: 200,
                     headers: { 'X-Request-Limit' => 1000, 'X-Request-Usage' => 10 })
-      _, resp = client.send(:do_get, 'http://www.af.com')
+      resp = client.send(:do_get, 'http://www.af.com')
       expect(resp).not_to be_nil
-      expect(resp[:body]).not_to be_nil
+      expect(resp[:body]).to eq(response_body)
       expect(resp[:code]).to be(200)
       expect(resp[:limit]).to eq(1000)
       expect(resp[:usage]).to eq(10)
@@ -159,7 +172,7 @@ describe AppFigures::Client do
     end
 
     it 'returns valid body with #usage' do
-      body = { 'usage'=>10 }
+      body = { 'usage' => 10 }
       @af.to_return(body: body.to_json,
                     status: 200,
                     headers: { 'X-Request-Limit' => 1000, 'X-Request-Usage' => 10 })
@@ -169,7 +182,7 @@ describe AppFigures::Client do
     end
 
     it 'returns valid body with #products' do
-      body = { 'id'=> 123, 'name'=>'myapp' }
+      body = { 'id' => 123, 'name' => 'myapp' }
       @af.to_return(body: body.to_json,
                     status: 200,
                     headers: { 'X-Request-Limit' => 1000, 'X-Request-Usage' => 10 })
@@ -179,17 +192,17 @@ describe AppFigures::Client do
     end
 
     it 'valid id with #products' do
-      body = { 'id'=> 123, 'name'=>'myapp' }
+      body = { 'id' => 123, 'name' => 'myapp' }
       @af.to_return(body: body.to_json,
                     status: 200,
                     headers: { 'X-Request-Limit' => 1000, 'X-Request-Usage' => 10 })
       resp = client.products(id: 123)
       expect(resp).not_to be_nil
-      expect(resp).to include(:body => body, :code => 200, :limit => 1000, :usage => 10)
+      expect(resp).to include(body: body, code: 200, limit: 1000, usage: 10)
     end
 
     it 'invalid id with #products' do
-      body = { 'id'=> 1234567, 'name'=>'myapp' }
+      body = { 'id' => 1234567, 'name' => 'myapp' }
       @af.to_return(body: body.to_json,
                     status: 200,
                     headers: { 'X-Request-Limit' => 1000, 'X-Request-Usage' => 10 })
@@ -197,7 +210,7 @@ describe AppFigures::Client do
     end
 
     it 'return valid body with #sales' do
-      body = { 'id'=> 123, 'name'=>'myapp' }
+      body = { 'id' => 123, 'name' => 'myapp' }
       @af.to_return(body: body.to_json,
                     status: 200,
                     headers: { 'X-Request-Limit' => 1000, 'X-Request-Usage' => 10 })
@@ -207,7 +220,7 @@ describe AppFigures::Client do
     end
 
     it 'return valid body with #revenue' do
-      body = { 'id'=> 123, 'name'=>'myapp' }
+      body = { 'id' => 123, 'name' => 'myapp' }
       @af.to_return(body: body.to_json,
                     status: 200,
                     headers: { 'X-Request-Limit' => 1000, 'X-Request-Usage' => 10 })
@@ -217,7 +230,7 @@ describe AppFigures::Client do
     end
 
     it 'return valid body with  #ads' do
-      body = { 'id'=> 123, 'name'=>'myapp' }
+      body = { 'id' => 123, 'name' => 'myapp' }
       @af.to_return(body: body.to_json,
                     status: 200,
                     headers: { 'X-Request-Limit' => 1000, 'X-Request-Usage' => 10 })
@@ -227,7 +240,7 @@ describe AppFigures::Client do
     end
 
     it 'return valid body with #rank' do
-      body = { 'rank'=> 15 }
+      body = { 'rank' => 15 }
       @af.to_return(body: body.to_json,
                     status: 200,
                     headers: { 'X-Request-Limit' => 1000, 'X-Request-Usage' => 10 })
@@ -237,7 +250,7 @@ describe AppFigures::Client do
     end
 
     it 'invalid parameters for #rank (missing id)' do
-      body = { 'rank'=> 15 }
+      body = { 'rank' => 15 }
       @af.to_return(body: body.to_json,
                     status: 200,
                     headers: { 'X-Request-Limit' => 1000, 'X-Request-Usage' => 10 })
@@ -249,7 +262,7 @@ describe AppFigures::Client do
     end
 
     it 'return valid body with #featured summary' do
-      body = { 'id'=> 123, 'paths'=> %w(apple free handheld) }
+      body = { 'id' => 123, 'paths' => %w(apple free handheld) }
       @af.to_return(body: body.to_json,
                     status: 200,
                     headers: { 'X-Request-Limit' => 1000, 'X-Request-Usage' => 10 })
@@ -259,7 +272,7 @@ describe AppFigures::Client do
     end
 
     it 'invalid parameters for #featured summary' do
-      body = { 'id'=> 123, 'paths'=> %w(apple free handheld) }
+      body = { 'id' => 123, 'paths' => %w(apple free handheld) }
       @af.to_return(body: body.to_json,
                     status: 200,
                     headers: { 'X-Request-Limit' => 1000, 'X-Request-Usage' => 10 })
@@ -275,7 +288,7 @@ describe AppFigures::Client do
     end
 
     it 'return valid body with #featured full' do
-      body = { 'id'=> 123, 'paths'=> %w(apple free handheld) }
+      body = { 'id' => 123, 'paths' => %w(apple free handheld) }
       @af.to_return(body: body.to_json,
                     status: 200,
                     headers: { 'X-Request-Limit' => 1000, 'X-Request-Usage' => 10 })
@@ -285,7 +298,7 @@ describe AppFigures::Client do
     end
 
     it 'invalid parameters for #featured full' do
-      body = { 'id'=> 123, 'paths'=> %w(apple free handheld) }
+      body = { 'id' => 123, 'paths' => %w(apple free handheld) }
       @af.to_return(body: body.to_json,
                     status: 200,
                     headers: { 'X-Request-Limit' => 1000, 'X-Request-Usage' => 10 })
@@ -306,7 +319,7 @@ describe AppFigures::Client do
     end
 
     it 'return valid body with #featured counts' do
-      body = { 'id'=> 123, 'paths'=> %w(apple free handheld) }
+      body = { 'id' => 123, 'paths' => %w(apple free handheld) }
       @af.to_return(body: body.to_json,
                     status: 200,
                     headers: { 'X-Request-Limit' => 1000, 'X-Request-Usage' => 10} )
@@ -316,7 +329,7 @@ describe AppFigures::Client do
     end
 
     it 'invalid parameter for #featured counts' do
-      body = { 'id'=> 123, 'paths'=> %w(apple free handheld) }
+      body = { 'id' => 123, 'paths' => %w(apple free handheld) }
       @af.to_return(body: body.to_json,
                     status: 200,
                     headers: { 'X-Request-Limit' => 1000, 'X-Request-Usage' => 10} )
@@ -324,7 +337,7 @@ describe AppFigures::Client do
     end
 
     it 'return valid body with #featured history' do
-      body = { 'id'=> 123, 'paths'=> %w(apple free handheld) }
+      body = { 'id' => 123, 'paths' => %w(apple free handheld) }
       @af.to_return(body: body.to_json,
                     status: 200,
                     headers: { 'X-Request-Limit' => 1000, 'X-Request-Usage' => 10 })
@@ -334,7 +347,7 @@ describe AppFigures::Client do
     end
 
     it 'invalid parameters for #featured history' do
-      body = { 'id'=> 123, 'paths'=> %w(apple free handheld) }
+      body = { 'id' => 123, 'paths' => %w(apple free handheld) }
       @af.to_return(body: body.to_json,
                     status: 200,
                     headers: { 'X-Request-Limit' => 1000, 'X-Request-Usage' => 10 })
@@ -351,7 +364,7 @@ describe AppFigures::Client do
     end
 
     it 'return valid body with #reviews' do
-      body = { 'id'=> 123, 'reviews'=> %w(rev1 rev2 rev3) }
+      body = { 'id' => 123, 'reviews' => %w(rev1 rev2 rev3) }
       @af.to_return(body: body.to_json,
                     status: 200,
                     headers: { 'X-Request-Limit' => 1000, 'X-Request-Usage' => 10 })
@@ -361,7 +374,7 @@ describe AppFigures::Client do
     end
 
     it 'return valid body with #reviews count' do
-      body = { 'id'=> 123, 'reviews'=> %w(rev1 rev2 rev3) }
+      body = { 'id' => 123, 'reviews' => %w(rev1 rev2 rev3) }
       @af.to_return(body: body.to_json,
                     status: 200,
                     headers: { 'X-Request-Limit' => 1000, 'X-Request-Usage' => 10 })
@@ -371,7 +384,7 @@ describe AppFigures::Client do
     end
 
     it 'invalid mode for #reviews' do
-      body = { 'id'=> 123, 'reviews'=> %w(rev1 rev2 rev3) }
+      body = { 'id' => 123, 'reviews' => %w(rev1 rev2 rev3) }
       @af.to_return(body: body.to_json,
                     status: 200,
                     headers: { 'X-Request-Limit' => 1000, 'X-Request-Usage' => 10 })
@@ -379,7 +392,7 @@ describe AppFigures::Client do
     end
 
     it 'return valid body with #ratings' do
-      body = { 'id'=> 123, 'ratings' => 10 }
+      body = { 'id' => 123, 'ratings' => 10 }
       @af.to_return(body: body.to_json,
                     status: 200,
                     headers: { 'X-Request-Limit' => 1000, 'X-Request-Usage' => 10 })
@@ -389,7 +402,7 @@ describe AppFigures::Client do
     end
 
     it 'return valid body with #get_events' do
-      body = { 'id'=> 123, 'events'=> %w(ev1 ev2 ev3) }
+      body = { 'id' => 123, 'events' => %w(ev1 ev2 ev3) }
       @af.to_return(body: body.to_json,
                     status: 200,
                     headers: { 'X-Request-Limit' => 1000, 'X-Request-Usage' => 10 })
@@ -399,7 +412,7 @@ describe AppFigures::Client do
     end
 
     it 'return valid body with #archive' do
-      body = { 'id'=> 123, 'reviews'=> %w(rev1 rev2 rev3) }
+      body = { 'id' => 123, 'reviews' => %w(rev1 rev2 rev3) }
       @af.to_return(body: body.to_json,
                     status: 200,
                     headers: { 'X-Request-Limit' => 1000, 'X-Request-Usage' => 10 })
@@ -409,7 +422,7 @@ describe AppFigures::Client do
     end
 
     it 'return valid body with #archive latest' do
-      body = { 'id'=> 123, 'reviews'=> %w(rev1 rev2 rev3) }
+      body = { 'id' => 123, 'reviews' => %w(rev1 rev2 rev3) }
       @af.to_return(body: body.to_json,
                     status: 200,
                     headers: { 'X-Request-Limit' => 1000, 'X-Request-Usage' => 10 })
@@ -419,7 +432,7 @@ describe AppFigures::Client do
     end
 
     it 'return valid body with #archive raw' do
-      body = { 'id'=> 123, 'reviews'=> %w(rev1 rev2 rev3) }
+      body = { 'id' => 123, 'reviews' => %w(rev1 rev2 rev3) }
       @af.to_return(body: body.to_json,
                     status: 200,
                     headers: { 'X-Request-Limit' => 1000, 'X-Request-Usage' => 10 })
@@ -429,7 +442,7 @@ describe AppFigures::Client do
     end
 
     it 'invalid parameter for #archive raw (missing id)' do
-      body = { 'id'=> 123, 'reviews'=> %w(rev1 rev2 rev3) }
+      body = { 'id' => 123, 'reviews' => %w(rev1 rev2 rev3) }
       @af.to_return(body: body.to_json,
                     status: 200,
                     headers: { 'X-Request-Limit' => 1000, 'X-Request-Usage' => 10 })
@@ -438,7 +451,7 @@ describe AppFigures::Client do
     end
 
     it 'return valid body with #users' do
-      body = { 'user id'=> 123}
+      body = { 'user id' => 123}
       @af.to_return(body: body.to_json,
                     status: 200,
                     headers: { 'X-Request-Limit' => 1000, 'X-Request-Usage' => 10 })
@@ -448,7 +461,7 @@ describe AppFigures::Client do
     end
 
     it 'invalid parameter for #users (invalid email)' do
-      body = { 'user id'=> 123}
+      body = { 'user id' => 123}
       @af.to_return(body: body.to_json,
                     status: 200,
                     headers: { 'X-Request-Limit' => 1000, 'X-Request-Usage' => 10 })
