@@ -1,21 +1,22 @@
 module AppFigures
   module API
-    BASE_URL     = 'https://api.appfigures.com/v2/'
+    BASE_URL = 'https://api.appfigures.com/v2'
 
-    ROOT         = 'https://api.appfigures.com/v2/'
-    PRODUCTS     = 'https://api.appfigures.com/v2/products'
-    SALES        = 'https://api.appfigures.com/v2/reports/sales'
-    REVENUE      = 'https://api.appfigures.com/v2/reports/revenue'
-    ADS          = 'https://api.appfigures.com/v2/reports/ads'
-    RANKS        = 'https://api.appfigures.com/v2/ranks'
-    FEATURED     = 'https://api.appfigures.com/v2/featured'
-    REVIEWS      = 'https://api.appfigures.com/v2/reviews'
-    RATINGS      = 'https://api.appfigures.com/v2/ratings'
-    EVENTS       = 'https://api.appfigures.com/v2/events'
-    ARCHIVE      = 'https://api.appfigures.com/v2/archive'
-    USERS        = 'https://api.appfigures.com/v2/users'
-    DATA         = 'https://api.appfigures.com/v2/data'
-    USAGE        = 'https://api.appfigures.com/v2/usage'
-    EXT_ACCOUNTS = 'https://api.appfigures.com/v2/external_accounts'
+    ROOT = "#{BASE_URL}/"
+    PRODUCTS = "#{BASE_URL}/products"
+    PRODUCTS_MINE = "#{BASE_URL}/products/mine"
+    SALES = "#{BASE_URL}/reports/sales"
+    REVENUE = "#{BASE_URL}/reports/revenue"
+    ADS = "#{BASE_URL}/reports/ads"
+    RANKS = "#{BASE_URL}/ranks"
+    FEATURED = "#{BASE_URL}/featured"
+    REVIEWS = "#{BASE_URL}/reviews"
+    RATINGS = "#{BASE_URL}/ratings"
+    EVENTS = "#{BASE_URL}/events"
+    ARCHIVE = "#{BASE_URL}/archive"
+    USERS = "#{BASE_URL}/users"
+    DATA = "#{BASE_URL}/data"
+    USAGE = "#{BASE_URL}/usage"
+    EXT_ACCOUNTS = "#{BASE_URL}/external_accounts"
   end
 end
