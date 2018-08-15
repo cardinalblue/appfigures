@@ -69,6 +69,18 @@ module AppFigures
       end
     end
 
+    # Listing all of your products
+    # See https://docs.appfigures.com/products#listing_all_of_your_products
+    def products_mine(store: nil)
+      url = "#{AppFigures::API::PRODUCTS_MINE}"
+      url += "?store=#{store}" if store
+
+      do_get(url)
+    rescue StandardError => e
+      puts e.message
+      puts e.backtrace
+    end
+
     # Get sales info from Appfigures
     # See http://docs.appfigures.com/api/reference/v2/sales for details
 
